@@ -644,7 +644,7 @@ const HomePage = () => {
                     <p className="text-xs text-gray-500 mb-1">{product.shop}</p>
 
                     {/* Product Name */}
-                    <h3 className="font-bold text-gray-800 text-sm sm:text-base line-clamp-2 mb-2 leading-tight">
+                    <h3 className="font-bold text-gray-800 text-sm sm:text-base  mb-2 leading-tight line-clamp-1">
                       {product.name}
                     </h3>
 
@@ -687,7 +687,7 @@ const HomePage = () => {
                       <span>{product.sold.toLocaleString()} sold</span>
                       <span className="flex items-center gap-1">
                         <svg
-                          className="w-3 h-3"
+                          className="w-3 h-3 flex-shrink-0"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -705,7 +705,7 @@ const HomePage = () => {
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        {product.location}
+                        <span className="line-clamp-1">{product.location}</span>
                       </span>
                     </div>
                   </div>
