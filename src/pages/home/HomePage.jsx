@@ -534,14 +534,14 @@ const HomePage = () => {
         {/* The Horizontal Scroll Container */}
         <div
           ref={productsRef}
-          className="hide-scrollbar flex gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+          className="hide-scrollbar flex gap-3 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
           onScroll={(e) => setProductScrollLeft(e.target.scrollLeft)}
         >
-          {products.map((item, index) => (
-            <div
+          {products.map((item) => (
+            <Link
+              to={`/product/${item.id}`}
               key={item.id}
               className="flex-shrink-0 w-35 md:w-40 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md snap-start transition-all duration-300 hover:-translate-y-1 cursor-pointer group/product"
-              onClick={() => scrollToProduct(index)}
             >
               <div className="w-full h-40 overflow-hidden rounded-t-2xl">
                 <img
@@ -559,7 +559,7 @@ const HomePage = () => {
                   {item.qty} items
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
         {/* ================= POPULAR PRODUCTS ================= */}
