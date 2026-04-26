@@ -1,6 +1,185 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 
+// =========================
+// REUSABLE PRODUCT CARD
+// =========================
+const ProductCard = ({ product }) => {
+  const finalPrice = (
+    product.unit_price *
+    (1 - product.discount_percent / 100)
+  ).toFixed(2);
+
+  const labelColors = {
+    Sale: "bg-orange-500",
+    "Best Sale": "bg-blue-600",
+    "Hot Deal": "bg-red-600",
+    Trending: "bg-purple-600",
+    "Top Rated": "bg-yellow-500",
+    "Save 15%": "bg-green-600",
+    "Save 20%": "bg-green-600",
+    New: "bg-teal-500",
+    Limited: "bg-pink-600",
+  };
+
+  return (
+    <Link
+      to={`/product/${product.id}`}
+      key={product.id}
+      className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg snap-start transition-all duration-300 hover:-translate-y-1 group/product overflow-hidden"
+    >
+      {/* Image Container */}
+      <div className="relative w-full h-44 sm:h-52 md:h-60 overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-bottom group-hover/product:scale-110 transition-transform duration-500"
+        />
+
+        {/* Label Badge */}
+        {product.label && (
+          <span
+            className={`absolute top-2 left-1/2 -translate-x-1/2 ${
+              labelColors[product.label] || "bg-gray-700"
+            } text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-md`}
+          >
+            {product.label}
+          </span>
+        )}
+
+        {/* Discount Badge */}
+        {product.discount_percent > 0 && (
+          <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+            -{product.discount_percent}%
+          </span>
+        )}
+
+        {/* Action Buttons - Wishlist & Cart */}
+        <div className="absolute top-2 right-2 flex flex-col gap-2">
+          <button
+            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
+            aria-label="Add to wishlist"
+            onClick={(e) => e.preventDefault()}
+          >
+            <svg
+              className="w-4 h-4 text-gray-400 hover:text-red-500 transition cursor-pointer"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+          </button>
+          <button
+            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
+            aria-label="Add to cart"
+            onClick={(e) => e.preventDefault()}
+          >
+            <svg
+              className="w-4 h-4 text-gray-400 hover:text-green-600 transition cursor-pointer"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Buy Now Overlay */}
+        <div className="absolute inset-x-0 bottom-0 p-2 translate-y-full group-hover/product:translate-y-0 transition-transform duration-300">
+          <button
+            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg shadow-lg transition cursor-pointer"
+            onClick={(e) => e.preventDefault()}
+          >
+            Buy Now
+          </button>
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="p-3 sm:p-4">
+        {/* Shop Name */}
+        <p className="text-xs text-gray-500 mb-1">{product.shop}</p>
+
+        {/* Product Name */}
+        <h3 className="font-bold text-gray-800 text-sm sm:text-base  mb-2 leading-tight line-clamp-1">
+          {product.name}
+        </h3>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 mb-2">
+          <div className="flex">
+            {[...Array(5)].map((_, i) => (
+              <svg
+                key={i}
+                className={`w-3.5 h-3.5 ${
+                  i < product.rating.star
+                    ? "text-yellow-400 fill-yellow-400"
+                    : "text-gray-300 fill-gray-300"
+                }`}
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+          <span className="text-xs text-gray-500">{product.rating.point}</span>
+        </div>
+
+        {/* Price */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-green-600 font-bold text-base sm:text-lg">
+            ${finalPrice}
+          </span>
+          {product.discount_percent > 0 && (
+            <span className="text-gray-400 text-xs line-through">
+              ${product.unit_price.toFixed(2)}
+            </span>
+          )}
+        </div>
+
+        {/* Sold & Location */}
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span>{product.sold.toLocaleString()} sold</span>
+          <span className="flex items-center gap-1">
+            <svg
+              className="w-3 h-3 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <span className="line-clamp-1">{product.location}</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -393,9 +572,121 @@ const HomePage = () => {
   ];
 
   // =========================
+  // DAILY BEST SELLERS DATA
+  // =========================
+  const dailyBestSellers = [
+    {
+      id: 201,
+      name: "Fresh Atlantic Salmon",
+      shop: "OceanCatch",
+      image:
+        "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 5, point: 4.9 },
+      unit_price: 29.99,
+      discount_percent: 22,
+      sold: 8900,
+      location: "Phnom Penh",
+    },
+    {
+      id: 202,
+      name: "Organic Honey Jar",
+      shop: "BeePure",
+      image:
+        "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 5, point: 4.8 },
+      unit_price: 14.49,
+      discount_percent: 15,
+      sold: 6700,
+      location: "Siem Reap",
+    },
+    {
+      id: 203,
+      name: "Extra Virgin Olive Oil",
+      shop: "Mediterraneo",
+      image:
+        "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 4, point: 4.6 },
+      unit_price: 19.99,
+      discount_percent: 18,
+      sold: 5400,
+      location: "Phnom Penh",
+    },
+    {
+      id: 204,
+      name: "Greek Yogurt Pack",
+      shop: "DairyGold",
+      image:
+        "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 5, point: 4.7 },
+      unit_price: 9.99,
+      discount_percent: 12,
+      sold: 7200,
+      location: "Battambang",
+    },
+    {
+      id: 205,
+      name: "Almond Butter Organic",
+      shop: "NuttyDelight",
+      image:
+        "https://natureland.net/_next/image/?url=https%3A%2F%2Fnaturelandcdn-master.fra1.cdn.digitaloceanspaces.com%2Fmedia%2Fnoname%2Fsku%2FkpsnCv%2Fa66ece14-6122-4f9b-bb21-794d7ab39aba_5GS7PwnvR.jpeg&w=3840&q=65",
+      rating: { star: 4, point: 4.5 },
+      unit_price: 16.49,
+      discount_percent: 20,
+      sold: 4100,
+      location: "Phnom Penh",
+    },
+    {
+      id: 206,
+      name: "Fresh Avocado (3pcs)",
+      shop: "GreenFarm",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx5QhX3eqhUiQTzeNWPJiZr40cER6uOoKxAQ&s",
+      rating: { star: 5, point: 4.8 },
+      unit_price: 7.99,
+      discount_percent: 10,
+      sold: 9500,
+      location: "Siem Reap",
+    },
+    {
+      id: 207,
+      name: "Basmati Rice 5kg",
+      shop: "RiceKing",
+      image:
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 4, point: 4.4 },
+      unit_price: 22.99,
+      discount_percent: 25,
+      sold: 6300,
+      location: "Battambang",
+    },
+    {
+      id: 208,
+      name: "Dark Chocolate Bar",
+      shop: "ChocoLux",
+      image:
+        "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=400&h=400",
+      rating: { star: 5, point: 4.9 },
+      unit_price: 5.49,
+      discount_percent: 15,
+      sold: 11000,
+      location: "Phnom Penh",
+    },
+  ];
+
+  // =========================
   // REFS
   // =========================
   const popularProductsRef = useRef(null);
+  const dailyBestSellersRef = useRef(null);
+  const popularIntervalRef = useRef(null);
+  const dailyIntervalRef = useRef(null);
+
+  // =========================
+  // AUTO SCROLL STATES
+  // =========================
+  const [isPopularAutoPlaying, setIsPopularAutoPlaying] = useState(true);
+  const [isDailyAutoPlaying, setIsDailyAutoPlaying] = useState(true);
+
   // =========================
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -404,6 +695,26 @@ const HomePage = () => {
   const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   }, [slides.length]);
+
+  // =========================
+  // AUTO SCROLL FUNCTIONS
+  // =========================
+  const autoScroll = useCallback((ref) => {
+    if (!ref.current) return;
+
+    const scrollAmount = 280;
+    const currentScroll = ref.current.scrollLeft;
+    const maxScroll = ref.current.scrollWidth - ref.current.clientWidth;
+
+    if (currentScroll >= maxScroll - 10) {
+      ref.current.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      ref.current.scrollTo({
+        left: currentScroll + scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  }, []);
 
   // =========================
   // PRODUCT SCROLL FUNCTIONS
@@ -452,19 +763,34 @@ const HomePage = () => {
     return () => clearInterval(intervalRef.current);
   }, [isAutoPlaying, nextSlide]);
 
+  useEffect(() => {
+    if (isPopularAutoPlaying) {
+      popularIntervalRef.current = setInterval(
+        () => autoScroll(popularProductsRef),
+        4000,
+      );
+    }
+    return () => clearInterval(popularIntervalRef.current);
+  }, [isPopularAutoPlaying, autoScroll]);
+
+  useEffect(() => {
+    if (isDailyAutoPlaying) {
+      dailyIntervalRef.current = setInterval(
+        () => autoScroll(dailyBestSellersRef),
+        4000,
+      );
+    }
+    return () => clearInterval(dailyIntervalRef.current);
+  }, [isDailyAutoPlaying, autoScroll]);
+
   return (
     <>
       {/* ================= CAROUSEL ================= */}
-      <div
-        className="relative overflow-hidden group"
-        onMouseEnter={() => setIsAutoPlaying(false)}
-        onMouseLeave={() => setIsAutoPlaying(true)}
-      >
+      <div className="relative overflow-hidden group" style={{ zIndex: 1 }}>
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
-          <div className="absolute z- w-full h-100% bg-black "></div>
           {slides.map((slide) => (
             <div
               key={slide.id}
@@ -475,7 +801,8 @@ const HomePage = () => {
                 alt=""
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80 flex flex-col justify-center items-center text-white p-4 text-center">
+              {/* Content overlay - z-index: 5 to stay above image but below navigation */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80 flex flex-col justify-center items-center text-white p-4 text-center z-5">
                 <h1 className="text-3xl md:text-5xl font-bold tracking-wide">
                   {slide.title}
                 </h1>
@@ -490,30 +817,30 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows - z-index: 10 (above content) */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 w-10 h-10 rounded-full text-white flex items-center justify-center transition backdrop-blur-sm"
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 w-10 h-10 rounded-full text-white flex items-center justify-center transition backdrop-blur-sm z-10"
         >
           ❮
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 w-10 h-10 rounded-full text-white flex items-center justify-center transition backdrop-blur-sm"
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 w-10 h-10 rounded-full text-white flex items-center justify-center transition backdrop-blur-sm z-10"
         >
           ❯
         </button>
       </div>
 
       {/* ================= PRODUCT SECTION ================= */}
-      <div className="py-3 px-6 w-full">
+      <div className="py-3 px-0 lg:px-10 md:px-5 w-full">
         <div className="flex items-center justify-between ">
-          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
+          <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
             Featured Categories
           </h2>
 
           {/* Product Navigation Arrows */}
-          <div className="flex gap-2 py-3">
+          <div className="flex gap-2 py-3 px-3">
             <button
               onClick={() => scrollProducts("prev")}
               className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12 text-sm sm:text-base md:text-lg bg-white border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md rounded-xl flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105"
@@ -562,15 +889,16 @@ const HomePage = () => {
             </Link>
           ))}
         </div>
+
         {/* ================= POPULAR PRODUCTS ================= */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
-            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
+            <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
               Popular Products
             </h2>
             <a
               href="/products"
-              className="text-sm sm:text-base text-green-600 hover:text-green-800 font-medium transition"
+              className="text-sm px-3 sm:text-base text-green-600 hover:text-green-800 font-medium transition"
             >
               View All →
             </a>
@@ -579,139 +907,38 @@ const HomePage = () => {
           <div
             ref={popularProductsRef}
             className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            onMouseEnter={() => setIsPopularAutoPlaying(false)}
+            onMouseLeave={() => setIsPopularAutoPlaying(true)}
           >
-            {popularProducts.map((product) => {
-              const finalPrice = (
-                product.unit_price *
-                (1 - product.discount_percent / 100)
-              ).toFixed(2);
-              return (
-                <Link
-                  to={`/product/${product.id}`}
-                  key={product.id}
-                  className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg snap-start transition-all duration-300 hover:-translate-y-1 group/product overflow-hidden"
-                >
-                  {/* Image Container */}
-                  <div className="relative w-full h-44 sm:h-52 md:h-60 overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-bottom group-hover/product:scale-110 transition-transform duration-500"
-                    />
+            {popularProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
 
-                    {/* Discount Badge */}
-                    {product.discount_percent > 0 && (
-                      <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
-                        -{product.discount_percent}%
-                      </span>
-                    )}
+        {/* ================= DAILY BEST SELLING PRODUCTS ================= */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
+              Daily Best Selling Products
+            </h2>
+            <a
+              href="/best-sellers"
+              className="text-sm px-3 sm:text-base text-green-600 hover:text-green-800 font-medium transition"
+            >
+              View All →
+            </a>
+          </div>
 
-                    {/* Wishlist Button */}
-                    <button
-                      className="absolute top-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
-                      aria-label="Add to wishlist"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <svg
-                        className="w-4 h-4 text-gray-400 hover:text-red-500 transition"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
-                      </svg>
-                    </button>
-
-                    {/* Quick Add Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 p-2 translate-y-full group-hover/product:translate-y-0 transition-transform duration-300">
-                      <button
-                        className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg shadow-lg transition"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-3 sm:p-4">
-                    {/* Shop Name */}
-                    <p className="text-xs text-gray-500 mb-1">{product.shop}</p>
-
-                    {/* Product Name */}
-                    <h3 className="font-bold text-gray-800 text-sm sm:text-base  mb-2 leading-tight line-clamp-1">
-                      {product.name}
-                    </h3>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 mb-2">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <svg
-                            key={i}
-                            className={`w-3.5 h-3.5 ${
-                              i < product.rating.star
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300 fill-gray-300"
-                            }`}
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {product.rating.point}
-                      </span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-green-600 font-bold text-base sm:text-lg">
-                        ${finalPrice}
-                      </span>
-                      {product.discount_percent > 0 && (
-                        <span className="text-gray-400 text-xs line-through">
-                          ${product.unit_price.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Sold & Location */}
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{product.sold.toLocaleString()} sold</span>
-                      <span className="flex items-center gap-1">
-                        <svg
-                          className="w-3 h-3 flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        <span className="line-clamp-1">{product.location}</span>
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+          <div
+            ref={dailyBestSellersRef}
+            className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            onMouseEnter={() => setIsDailyAutoPlaying(false)}
+            onMouseLeave={() => setIsDailyAutoPlaying(true)}
+          >
+            {dailyBestSellers.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </div>

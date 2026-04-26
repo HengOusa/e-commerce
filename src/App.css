@@ -81,3 +81,50 @@ html {
 *::-webkit-scrollbar {
   display: none;
 }
+/* Z-Index Management System */
+:root {
+  /* Base levels */
+  --z-below: -1;
+  --z-auto: auto;
+  --z-base: 0;
+  --z-low: 1;
+  --z-normal: 5;
+  --z-above: 10;
+  
+  /* Component specific */
+  --z-carousel-content: 5;
+  --z-carousel-nav: 10;
+  --z-tablet-header: 20;
+  --z-desktop-header: 25;
+  --z-sticky-nav: 30;
+  --z-header: 30;
+  --z-desktop-nav: 35;
+  --z-dropdown: 40;
+  --z-mobile-category-bar: 45;
+  --z-modal-backdrop: 100;
+  --z-modal: 101;
+  --z-toast: 200;
+  --z-tooltip: 300;
+}
+
+/* Tailwind custom utilities (if using Tailwind) */
+@layer utilities {
+  .z-below { z-index: -1; }
+  .z-base { z-index: 0; }
+  .z-low { z-index: 1; }
+  .z-normal { z-index: 5; }
+  .z-above { z-index: 10; }
+  .z-carousel-content { z-index: 5; }
+  .z-carousel-nav { z-index: 10; }
+  .z-tablet-header { z-index: 20; }
+  .z-desktop-header { z-index: 25; }
+  .z-sticky-nav { z-index: 30; }
+  .z-header { z-index: 30; }
+  .z-desktop-nav { z-index: 35; }
+  .z-dropdown { z-index: 40; }
+  .z-mobile-category-bar { z-index: 45; }
+  .z-modal-backdrop { z-index: 100; }
+  .z-modal { z-index: 101; }
+  .z-toast { z-index: 200; }
+  .z-tooltip { z-index: 300; }
+}
