@@ -1,184 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-
-// =========================
-// REUSABLE PRODUCT CARD
-// =========================
-const ProductCard = ({ product }) => {
-  const finalPrice = (
-    product.unit_price *
-    (1 - product.discount_percent / 100)
-  ).toFixed(2);
-
-  const labelColors = {
-    Sale: "bg-orange-500",
-    "Best Sale": "bg-blue-600",
-    "Hot Deal": "bg-red-600",
-    Trending: "bg-purple-600",
-    "Top Rated": "bg-yellow-500",
-    "Save 15%": "bg-green-600",
-    "Save 20%": "bg-green-600",
-    New: "bg-teal-500",
-    Limited: "bg-pink-600",
-  };
-
-  return (
-    <Link
-      to={`/product/${product.id}`}
-      key={product.id}
-      className="flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg snap-start transition-all duration-300 hover:-translate-y-1 group/product overflow-hidden"
-    >
-      {/* Image Container */}
-      <div className="relative w-full h-44 sm:h-52 md:h-60 overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-bottom group-hover/product:scale-110 transition-transform duration-500"
-        />
-
-        {/* Label Badge */}
-        {product.label && (
-          <span
-            className={`absolute top-2 left-1/2 -translate-x-1/2 ${
-              labelColors[product.label] || "bg-gray-700"
-            } text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-md`}
-          >
-            {product.label}
-          </span>
-        )}
-
-        {/* Discount Badge */}
-        {product.discount_percent > 0 && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
-            -{product.discount_percent}%
-          </span>
-        )}
-
-        {/* Action Buttons - Wishlist & Cart */}
-        <div className="absolute top-2 right-2 flex flex-col gap-2">
-          <button
-            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
-            aria-label="Add to wishlist"
-            onClick={(e) => e.preventDefault()}
-          >
-            <svg
-              className="w-4 h-4 text-gray-400 hover:text-red-500 transition cursor-pointer"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button>
-          <button
-            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
-            aria-label="Add to cart"
-            onClick={(e) => e.preventDefault()}
-          >
-            <svg
-              className="w-4 h-4 text-gray-400 hover:text-green-600 transition cursor-pointer"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Buy Now Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-2 translate-y-full group-hover/product:translate-y-0 transition-transform duration-300">
-          <button
-            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg shadow-lg transition cursor-pointer"
-            onClick={(e) => e.preventDefault()}
-          >
-            Buy Now
-          </button>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div className="p-3 sm:p-4">
-        {/* Shop Name */}
-        <p className="text-xs text-gray-500 mb-1">{product.shop}</p>
-
-        {/* Product Name */}
-        <h3 className="font-bold text-gray-800 text-sm sm:text-base  mb-2 leading-tight line-clamp-1">
-          {product.name}
-        </h3>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <svg
-                key={i}
-                className={`w-3.5 h-3.5 ${
-                  i < product.rating.star
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300 fill-gray-300"
-                }`}
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-          <span className="text-xs text-gray-500">{product.rating.point}</span>
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-green-600 font-bold text-base sm:text-lg">
-            ${finalPrice}
-          </span>
-          {product.discount_percent > 0 && (
-            <span className="text-gray-400 text-xs line-through">
-              ${product.unit_price.toFixed(2)}
-            </span>
-          )}
-        </div>
-
-        {/* Sold & Location */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>{product.sold.toLocaleString()} sold</span>
-          <span className="flex items-center gap-1">
-            <svg
-              className="w-3 h-3 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span className="line-clamp-1">{product.location}</span>
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-};
+import { ChevronDown } from "lucide-react";
+import ProductCard from "../../components/Prodcuts/ProductCard";
+import {
+  products,
+  popularProducts,
+  dailyBestSellers,
+} from "../../data/products";
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -324,356 +152,6 @@ const HomePage = () => {
   ];
 
   // =========================
-  // PRODUCTS DATA
-  // =========================
-  const products = [
-    {
-      id: 1,
-      name: "Banana",
-      image:
-        "https://e7.pngegg.com/pngimages/595/523/png-clipart-six-ripe-banana-juice-banana-powder-flavor-fruit-yellow-bananas-natural-foods-food-thumbnail.png",
-      qty: 10,
-    },
-    {
-      id: 2,
-      name: "Apple",
-      image:
-        "https://newindiansupermarket.com/cdn/shop/products/APPLE-RED.jpg?v=1739257722&width=1214",
-      qty: 12,
-    },
-    {
-      id: 3,
-      name: "Orange",
-      image:
-        "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=300&h=300",
-      qty: 8,
-    },
-    {
-      id: 4,
-      name: "Vegetables",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2JO52DNhosOU-MN9GQl_Ti1We4lPkUaUVCQ&s",
-      qty: 20,
-    },
-    {
-      id: 5,
-      name: "Milk",
-      image:
-        "https://premierproduceone.com/media/catalog/product/cache/28bf51390c6a7eeeeb3ce2b166c68ce8/9/4/94568_whole_milk.jpeg.jpg",
-      qty: 6,
-    },
-    {
-      id: 6,
-      name: "Bread",
-      image:
-        "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&h=300",
-      qty: 14,
-    },
-    {
-      id: 7,
-      name: "Meat",
-      image:
-        "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=300&h=300",
-      qty: 9,
-    },
-    {
-      id: 8,
-      name: "Eggs",
-      image:
-        "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=300&h=300",
-      qty: 30,
-    },
-    {
-      id: 9,
-      name: "Cheese",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuvp46y8Fcky7GVq9nVUTCi4kxOqlA7-R2wQ&s",
-      qty: 5,
-    },
-    {
-      id: 10,
-      name: "Fish",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu35bXPse5ZXElK7hV9m4i0AsZ0o5TlxPVNw&s",
-      qty: 11,
-    },
-    {
-      id: 11,
-      name: "Chicken",
-      image:
-        "https://static.vecteezy.com/system/resources/thumbnails/044/776/845/small/chicken-isolated-on-transparent-background-png.png",
-      qty: 13,
-    },
-    {
-      id: 12,
-      name: "Rice",
-      image:
-        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&h=300",
-      qty: 50,
-    },
-    {
-      id: 13,
-      name: "Noodles",
-      image:
-        "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=300&h=300",
-      qty: 18,
-    },
-    {
-      id: 14,
-      name: "Coffee",
-      image:
-        "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&h=300",
-      qty: 7,
-    },
-    {
-      id: 15,
-      name: "Tea",
-      image:
-        "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=300&h=300",
-      qty: 9,
-    },
-    {
-      id: 16,
-      name: "Juice",
-      image:
-        "https://images.unsplash.com/photo-1577805947697-89e18249d767?auto=format&fit=crop&w=300&h=300",
-      qty: 16,
-    },
-    {
-      id: 17,
-      name: "Water",
-      image:
-        "https://images.unsplash.com/photo-1564419320461-6870880221ad?auto=format&fit=crop&w=300&h=300",
-      qty: 40,
-    },
-    {
-      id: 18,
-      name: "Chocolate",
-      image:
-        "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=300&h=300",
-      qty: 10,
-    },
-    {
-      id: 19,
-      name: "Ice Cream",
-      image:
-        "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=300&h=300",
-      qty: 6,
-    },
-    {
-      id: 20,
-      name: "Butter",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0fCLziY34uNDxaTGcLo3VEv3s8GoQo8tTWQ&s",
-      qty: 8,
-    },
-  ];
-
-  // =========================
-  // POPULAR PRODUCTS DATA
-  // =========================
-  const popularProducts = [
-    {
-      id: 101,
-      name: "Organic Fresh Bananas",
-      shop: "FreshMart",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRloKeC5BYOK4EcN29XQy_0QgPAJh6GBqXHTw&s",
-      rating: { star: 4, point: 4.5 },
-      unit_price: 12.99,
-      discount_percent: 15,
-      sold: 2340,
-      location: "Phnom Penh",
-    },
-    {
-      id: 102,
-      name: "Red Delicious Apples",
-      shop: "FruitKing",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIRcW1Az7WGp3WEyEeV3vVEq2YflDFL5l-Dw&s",
-      rating: { star: 5, point: 4.8 },
-      unit_price: 8.49,
-      discount_percent: 10,
-      sold: 1890,
-      location: "Siem Reap",
-    },
-    {
-      id: 103,
-      name: "Fresh Orange Juice Pack",
-      shop: "JuicyBar",
-      image:
-        "https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 4, point: 4.2 },
-      unit_price: 5.99,
-      discount_percent: 20,
-      sold: 3200,
-      location: "Phnom Penh",
-    },
-    {
-      id: 104,
-      name: "Mixed Vegetables Box",
-      shop: "VeggieLand",
-      image:
-        "https://5.imimg.com/data5/BG/IB/CI/SELLER-7051866/fresh-vegetables.jpg",
-      rating: { star: 5, point: 4.9 },
-      unit_price: 18.99,
-      discount_percent: 25,
-      sold: 1560,
-      location: "Battambang",
-    },
-    {
-      id: 105,
-      name: "Whole Milk 1L Premium",
-      shop: "DairyBest",
-      image:
-        "https://www.kibsons.com/_next/image?url=https%3A%2F%2Fcdn.kibsons.com%2Fproducts%2Fdetail%2FHPL_MILMIFRPM1LTS1_20240102085351.jpg&w=640&q=90",
-      rating: { star: 4, point: 4.3 },
-      unit_price: 3.49,
-      discount_percent: 5,
-      sold: 5600,
-      location: "Phnom Penh",
-    },
-    {
-      id: 106,
-      name: "Artisan Sourdough Bread",
-      shop: "BakeHouse",
-      image:
-        "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.7 },
-      unit_price: 6.99,
-      discount_percent: 12,
-      sold: 980,
-      location: "Siem Reap",
-    },
-    {
-      id: 107,
-      name: "Premium Beef Steak",
-      shop: "MeatMaster",
-      image:
-        "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 4, point: 4.4 },
-      unit_price: 24.99,
-      discount_percent: 18,
-      sold: 750,
-      location: "Phnom Penh",
-    },
-    {
-      id: 108,
-      name: "Farm Fresh Eggs (12pcs)",
-      shop: "EggCellent",
-      image:
-        "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.6 },
-      unit_price: 4.29,
-      discount_percent: 8,
-      sold: 4200,
-      location: "Battambang",
-    },
-  ];
-
-  // =========================
-  // DAILY BEST SELLERS DATA
-  // =========================
-  const dailyBestSellers = [
-    {
-      id: 201,
-      name: "Fresh Atlantic Salmon",
-      shop: "OceanCatch",
-      image:
-        "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.9 },
-      unit_price: 29.99,
-      discount_percent: 22,
-      sold: 8900,
-      location: "Phnom Penh",
-    },
-    {
-      id: 202,
-      name: "Organic Honey Jar",
-      shop: "BeePure",
-      image:
-        "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.8 },
-      unit_price: 14.49,
-      discount_percent: 15,
-      sold: 6700,
-      location: "Siem Reap",
-    },
-    {
-      id: 203,
-      name: "Extra Virgin Olive Oil",
-      shop: "Mediterraneo",
-      image:
-        "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 4, point: 4.6 },
-      unit_price: 19.99,
-      discount_percent: 18,
-      sold: 5400,
-      location: "Phnom Penh",
-    },
-    {
-      id: 204,
-      name: "Greek Yogurt Pack",
-      shop: "DairyGold",
-      image:
-        "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.7 },
-      unit_price: 9.99,
-      discount_percent: 12,
-      sold: 7200,
-      location: "Battambang",
-    },
-    {
-      id: 205,
-      name: "Almond Butter Organic",
-      shop: "NuttyDelight",
-      image:
-        "https://natureland.net/_next/image/?url=https%3A%2F%2Fnaturelandcdn-master.fra1.cdn.digitaloceanspaces.com%2Fmedia%2Fnoname%2Fsku%2FkpsnCv%2Fa66ece14-6122-4f9b-bb21-794d7ab39aba_5GS7PwnvR.jpeg&w=3840&q=65",
-      rating: { star: 4, point: 4.5 },
-      unit_price: 16.49,
-      discount_percent: 20,
-      sold: 4100,
-      location: "Phnom Penh",
-    },
-    {
-      id: 206,
-      name: "Fresh Avocado (3pcs)",
-      shop: "GreenFarm",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx5QhX3eqhUiQTzeNWPJiZr40cER6uOoKxAQ&s",
-      rating: { star: 5, point: 4.8 },
-      unit_price: 7.99,
-      discount_percent: 10,
-      sold: 9500,
-      location: "Siem Reap",
-    },
-    {
-      id: 207,
-      name: "Basmati Rice 5kg",
-      shop: "RiceKing",
-      image:
-        "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 4, point: 4.4 },
-      unit_price: 22.99,
-      discount_percent: 25,
-      sold: 6300,
-      location: "Battambang",
-    },
-    {
-      id: 208,
-      name: "Dark Chocolate Bar",
-      shop: "ChocoLux",
-      image:
-        "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=400&h=400",
-      rating: { star: 5, point: 4.9 },
-      unit_price: 5.49,
-      discount_percent: 15,
-      sold: 11000,
-      location: "Phnom Penh",
-    },
-  ];
-
-  // =========================
   // REFS
   // =========================
   const popularProductsRef = useRef(null);
@@ -686,6 +164,13 @@ const HomePage = () => {
   // =========================
   const [isPopularAutoPlaying, setIsPopularAutoPlaying] = useState(true);
   const [isDailyAutoPlaying, setIsDailyAutoPlaying] = useState(true);
+
+  // =========================
+  // ARROW VISIBILITY STATES
+  // =========================
+  const [showFeaturedArrows, setShowFeaturedArrows] = useState(false);
+  const [showPopularArrows, setShowPopularArrows] = useState(false);
+  const [showDailyArrows, setShowDailyArrows] = useState(false);
 
   // =========================
   const nextSlide = useCallback(() => {
@@ -722,7 +207,7 @@ const HomePage = () => {
   const scrollProducts = useCallback((direction) => {
     if (!productsRef.current) return;
 
-    const scrollAmount = 300; // Scroll by 300px
+    const scrollAmount = 300;
     const currentScroll = productsRef.current.scrollLeft;
     const maxScroll =
       productsRef.current.scrollWidth - productsRef.current.clientWidth;
@@ -744,10 +229,58 @@ const HomePage = () => {
     }
   }, []);
 
+  const scrollPopular = useCallback((direction) => {
+    if (!popularProductsRef.current) return;
+
+    const scrollAmount = 300;
+    const currentScroll = popularProductsRef.current.scrollLeft;
+    const maxScroll =
+      popularProductsRef.current.scrollWidth -
+      popularProductsRef.current.clientWidth;
+
+    if (direction === "next") {
+      const newScroll = Math.min(currentScroll + scrollAmount, maxScroll);
+      popularProductsRef.current.scrollTo({
+        left: newScroll,
+        behavior: "smooth",
+      });
+    } else {
+      const newScroll = Math.max(currentScroll - scrollAmount, 0);
+      popularProductsRef.current.scrollTo({
+        left: newScroll,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
+  const scrollDaily = useCallback((direction) => {
+    if (!dailyBestSellersRef.current) return;
+
+    const scrollAmount = 300;
+    const currentScroll = dailyBestSellersRef.current.scrollLeft;
+    const maxScroll =
+      dailyBestSellersRef.current.scrollWidth -
+      dailyBestSellersRef.current.clientWidth;
+
+    if (direction === "next") {
+      const newScroll = Math.min(currentScroll + scrollAmount, maxScroll);
+      dailyBestSellersRef.current.scrollTo({
+        left: newScroll,
+        behavior: "smooth",
+      });
+    } else {
+      const newScroll = Math.max(currentScroll - scrollAmount, 0);
+      dailyBestSellersRef.current.scrollTo({
+        left: newScroll,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
   const scrollToProduct = useCallback((index) => {
     if (!productsRef.current) return;
 
-    const productWidth = 220; // Approximate width including gap
+    const productWidth = 220;
     const scrollPosition = index * productWidth;
     productsRef.current.scrollTo({
       left: scrollPosition,
@@ -801,7 +334,7 @@ const HomePage = () => {
                 alt=""
                 className="w-full h-full object-cover"
               />
-              {/* Content overlay - z-index: 5 to stay above image but below navigation */}
+              {/* Content overlay */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80 flex flex-col justify-center items-center text-white p-4 text-center z-5">
                 <h1 className="text-3xl md:text-5xl font-bold tracking-wide">
                   {slide.title}
@@ -817,7 +350,7 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Navigation Arrows - z-index: 10 (above content) */}
+        {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 w-10 h-10 rounded-full text-white flex items-center justify-center transition backdrop-blur-sm z-10"
@@ -838,56 +371,68 @@ const HomePage = () => {
           <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
             Featured Categories
           </h2>
-
-          {/* Product Navigation Arrows */}
-          <div className="flex gap-2 py-3 px-3">
-            <button
-              onClick={() => scrollProducts("prev")}
-              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12 text-sm sm:text-base md:text-lg bg-white border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md rounded-xl flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105"
-              aria-label="Scroll left"
-            >
-              ❮
-            </button>
-            <button
-              onClick={() => scrollProducts("next")}
-              className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12 text-sm sm:text-base md:text-lg bg-white border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md rounded-xl flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105"
-              aria-label="Scroll right"
-            >
-              ❯
-            </button>
-          </div>
+          <a
+            href="/products"
+            className="text-sm px-3 sm:text-base text-green-600 hover:text-green-800 font-medium transition"
+          >
+            View All →
+          </a>
         </div>
 
         {/* The Horizontal Scroll Container */}
         <div
-          ref={productsRef}
-          className="hide-scrollbar flex gap-3 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-          onScroll={(e) => setProductScrollLeft(e.target.scrollLeft)}
+          className="relative"
+          onMouseEnter={() => setShowFeaturedArrows(true)}
+          onMouseLeave={() => setShowFeaturedArrows(false)}
         >
-          {products.map((item) => (
-            <Link
-              to={`/product/${item.id}`}
-              key={item.id}
-              className="flex-shrink-0 w-35 md:w-40 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md snap-start transition-all duration-300 hover:-translate-y-1 cursor-pointer group/product"
-            >
-              <div className="w-full h-40 overflow-hidden rounded-t-2xl">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover group-hover/product:scale-110 transition-transform duration-300"
-                />
-              </div>
+          {/* Left Scroll Button */}
+          <button
+            onClick={() => scrollProducts("prev")}
+            className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showFeaturedArrows ? "opacity-100" : "opacity-0"}`}
+            aria-label="Scroll left"
+          >
+            <ChevronDown className="w-5 h-5 -rotate-90" />
+          </button>
 
-              <div className="p-4 text-center">
-                <h3 className="font-bold text-gray-800 text-sm md:text-base line-clamp-2">
-                  {item.name}
-                </h3>
-                <p className="text-sm text-green-600 font-medium mt-1">
-                  {item.qty} items
-                </p>
-              </div>
-            </Link>
-          ))}
+          {/* Right Scroll Button */}
+          <button
+            onClick={() => scrollProducts("next")}
+            className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showFeaturedArrows ? "opacity-100" : "opacity-0"}`}
+            aria-label="Scroll right"
+          >
+            <ChevronDown className="w-5 h-5 rotate-90" />
+          </button>
+
+          <div
+            ref={productsRef}
+            className="hide-scrollbar flex gap-3 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            onScroll={(e) => setProductScrollLeft(e.target.scrollLeft)}
+          >
+            {products.map((item) => (
+              <Link
+                to={`/product/${item.id}`}
+                key={item.id}
+                className="flex-shrink-0 w-35 md:w-40 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md snap-start transition-all duration-300 hover:-translate-y-1 cursor-pointer group/product"
+              >
+                <div className="w-full h-40 overflow-hidden rounded-t-2xl">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover/product:scale-110 transition-transform duration-300"
+                  />
+                </div>
+
+                <div className="p-4 text-center">
+                  <h3 className="font-bold text-gray-800 text-sm md:text-base line-clamp-2">
+                    {item.name}
+                  </h3>
+                  <p className="text-sm text-green-600 font-medium mt-1">
+                    {item.qty} items
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* ================= POPULAR PRODUCTS ================= */}
@@ -905,14 +450,42 @@ const HomePage = () => {
           </div>
 
           <div
-            ref={popularProductsRef}
-            className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-            onMouseEnter={() => setIsPopularAutoPlaying(false)}
-            onMouseLeave={() => setIsPopularAutoPlaying(true)}
+            className="relative"
+            onMouseEnter={() => {
+              setIsPopularAutoPlaying(false);
+              setShowPopularArrows(true);
+            }}
+            onMouseLeave={() => {
+              setIsPopularAutoPlaying(true);
+              setShowPopularArrows(false);
+            }}
           >
-            {popularProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {/* Left Scroll Button */}
+            <button
+              onClick={() => scrollPopular("prev")}
+              className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showPopularArrows ? "opacity-100" : "opacity-0"}`}
+              aria-label="Scroll left"
+            >
+              <ChevronDown className="w-5 h-5 -rotate-90" />
+            </button>
+
+            {/* Right Scroll Button */}
+            <button
+              onClick={() => scrollPopular("next")}
+              className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showPopularArrows ? "opacity-100" : "opacity-0"}`}
+              aria-label="Scroll right"
+            >
+              <ChevronDown className="w-5 h-5 rotate-90" />
+            </button>
+
+            <div
+              ref={popularProductsRef}
+              className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            >
+              {popularProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -931,14 +504,42 @@ const HomePage = () => {
           </div>
 
           <div
-            ref={dailyBestSellersRef}
-            className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-            onMouseEnter={() => setIsDailyAutoPlaying(false)}
-            onMouseLeave={() => setIsDailyAutoPlaying(true)}
+            className="relative"
+            onMouseEnter={() => {
+              setIsDailyAutoPlaying(false);
+              setShowDailyArrows(true);
+            }}
+            onMouseLeave={() => {
+              setIsDailyAutoPlaying(true);
+              setShowDailyArrows(false);
+            }}
           >
-            {dailyBestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {/* Left Scroll Button */}
+            <button
+              onClick={() => scrollDaily("prev")}
+              className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showDailyArrows ? "opacity-100" : "opacity-0"}`}
+              aria-label="Scroll left"
+            >
+              <ChevronDown className="w-5 h-5 -rotate-90" />
+            </button>
+
+            {/* Right Scroll Button */}
+            <button
+              onClick={() => scrollDaily("next")}
+              className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 bg-white/90 backdrop-blur-sm border border-gray-200 hover:border-gray-300 shadow-lg hover:shadow-xl rounded-full flex items-center justify-center text-gray-600 hover:text-gray-800 transition-all duration-200 hover:scale-105 ${showDailyArrows ? "opacity-100" : "opacity-0"}`}
+              aria-label="Scroll right"
+            >
+              <ChevronDown className="w-5 h-5 rotate-90" />
+            </button>
+
+            <div
+              ref={dailyBestSellersRef}
+              className="hide-scrollbar flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto pb-6 pt-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            >
+              {dailyBestSellers.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

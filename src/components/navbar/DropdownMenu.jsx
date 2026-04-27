@@ -27,7 +27,7 @@ const DropdownMenu = ({ options, value, onChange, placeholder }) => {
       </button>
       
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-20 overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 w-44 z-0 bg-white border border-gray-200 rounded-md shadow-lg overflow-hidden">
           {options.map((opt) => (
             <div
               key={opt.value}

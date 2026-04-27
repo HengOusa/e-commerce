@@ -103,7 +103,7 @@ const Header = () => {
       <div className="md:hidden">
         {/* Sticky Mobile Top Bar - z-index: 50 */}
         <div
-          className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
+          className={`sticky top-0 z-50 w-full bg-white transition-shadow duration-300 ${
             scrolled || mobileMenuOpen ? "shadow-md" : ""
           }`}
         >
@@ -165,15 +165,12 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Spacer for fixed header */}
-        <div className="h-14"></div>
-
         {/* Mobile Menu Overlay & Drawer — with proper z-index stacking */}
         {/* Backdrop - z-index: 100 (below drawer) */}
         <div
-          className={`fixed inset-0 z-[100] backdrop-blur-sm transition-opacity duration-300 ${
+          className={`fixed inset-0 z-100 backdrop-blur-sm transition-opacity duration-300 ${
             mobileMenuOpen
-              ? "bg-black/50 opacity-100 pointer-events-auto"
+              ? "bg-black/50 opacity-100 pointer-events-auto "
               : "bg-black/50 opacity-0 pointer-events-none"
           }`}
           onClick={() => setMobileMenuOpen(false)}
@@ -181,12 +178,12 @@ const Header = () => {
 
         {/* Drawer - z-index: 101 (above backdrop) */}
         <div
-          className={`fixed top-0 left-0 bottom-0 w-[280px] max-w-[80vw] bg-white z-[101] shadow-2xl overflow-y-auto transition-transform duration-300 ease-out ${
+          className={`fixed top-0 left-0 bottom-0 w-[280px] max-w-[80vw] bg-white z-101 shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 ease-out ${
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           {/* Drawer Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="shrink-0 flex items-center justify-between p-4 border-b border-gray-100">
             <Link
               to="/"
               className="flex items-center gap-2"
@@ -204,160 +201,169 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Mobile Search in Drawer */}
-          <div className="p-4 border-b border-gray-100">
-            <div className="flex items-center gap-2 border border-gray-300 rounded-lg bg-gray-50 px-3 py-2">
-              <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Search for products..."
-                className="flex-1 bg-transparent text-sm focus:outline-none"
-              />
+          {/* Scrollable Drawer Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Mobile Search in Drawer */}
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center gap-2 border border-gray-300 rounded-lg bg-gray-50 px-3 py-2">
+                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search for products..."
+                  className="flex-1 bg-transparent text-sm focus:outline-none"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Navigation Links */}
-          <nav className="py-2">
-            {mobileNavLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors border-b border-gray-50"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="text-sm font-medium">{link.label}</span>
-              </Link>
-            ))}
-          </nav>
-
-          {/* Language & Currency */}
-          <div className="p-4 border-t border-gray-100">
-            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              Preferences
-            </h4>
-            <div className="space-y-4">
-              {/* Language */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setLangOpen(!langOpen);
-                    setCurrencyOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-green-200 hover:shadow-sm transition-all group text-left"
+            {/* Navigation Links */}
+            <nav className="py-2">
+              {mobileNavLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors border-b border-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                    <Globe className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
-                      Language
-                    </p>
-                    <p className="text-sm font-semibold text-gray-800">
-                      {languages.find((l) => l.value === selectedLang)?.label}
-                    </p>
-                  </div>
-                  <ChevronDown
-                    className={`w-4 h-4 text-gray-300 group-hover:text-green-500 transition-colors ${
-                      langOpen ? "rotate-180" : ""
+                  <span className="text-sm font-medium">{link.label}</span>
+                </Link>
+              ))}
+            </nav>
+
+            {/* Language & Currency */}
+            <div className="p-4 border-t border-gray-100">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Preferences
+              </h4>
+              <div className="space-y-4">
+                {/* Language */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setLangOpen(!langOpen);
+                      setCurrencyOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-green-200 hover:shadow-sm transition-all group text-left"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+                        Language
+                      </p>
+                      <p className="text-sm font-semibold text-gray-800">
+                        {languages.find((l) => l.value === selectedLang)?.label}
+                      </p>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-gray-300 group-hover:text-green-500 transition-colors ${
+                        langOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {/* Language Options */}
+                  <div
+                    className={`overflow-hidden transition-all duration-200 ${
+                      langOpen
+                        ? "max-h-32 opacity-100 mt-1"
+                        : "max-h-0 opacity-0"
                     }`}
-                  />
-                </button>
-                {/* Language Options */}
-                <div
-                  className={`overflow-hidden transition-all duration-200 ${
-                    langOpen ? "max-h-32 opacity-100 mt-1" : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="mx-1 rounded-lg border border-gray-100 bg-gray-50/80 overflow-hidden">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.value}
-                        onClick={() => {
-                          setSelectedLang(lang.value);
-                          setLangOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                          selectedLang === lang.value
-                            ? "bg-green-50 text-green-700 font-semibold"
-                            : "text-gray-700 hover:bg-white"
-                        }`}
-                      >
-                        {lang.label}
-                      </button>
-                    ))}
+                  >
+                    <div className="mx-1 rounded-lg border border-gray-100 bg-gray-50/80 overflow-hidden">
+                      {languages.map((lang) => (
+                        <button
+                          key={lang.value}
+                          onClick={() => {
+                            setSelectedLang(lang.value);
+                            setLangOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                            selectedLang === lang.value
+                              ? "bg-green-50 text-green-700 font-semibold"
+                              : "text-gray-700 hover:bg-white"
+                          }`}
+                        >
+                          {lang.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Currency */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setCurrencyOpen(!currencyOpen);
+                      setLangOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-green-200 hover:shadow-sm transition-all group text-left"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+                        Currency
+                      </p>
+                      <p className="text-sm font-semibold text-gray-800">
+                        {
+                          currencies.find((c) => c.value === selectedCurrency)
+                            ?.label
+                        }
+                      </p>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-gray-300 group-hover:text-green-500 transition-colors ${
+                        currencyOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {/* Currency Options */}
+                  <div
+                    className={`overflow-hidden transition-all duration-200 ${
+                      currencyOpen
+                        ? "max-h-32 opacity-100 mt-1"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="mx-1 rounded-lg border border-gray-100 bg-gray-50/80 overflow-hidden">
+                      {currencies.map((curr) => (
+                        <button
+                          key={curr.value}
+                          onClick={() => {
+                            setSelectedCurrency(curr.value);
+                            setCurrencyOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                            selectedCurrency === curr.value
+                              ? "bg-green-50 text-green-700 font-semibold"
+                              : "text-gray-700 hover:bg-white"
+                          }`}
+                        >
+                          <span className="font-medium">{curr.label}</span>
+                          <span className="text-gray-400 ml-1">
+                            — {curr.sub}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* Currency */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setCurrencyOpen(!currencyOpen);
-                    setLangOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-green-200 hover:shadow-sm transition-all group text-left"
-                >
-                  <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
-                      Currency
-                    </p>
-                    <p className="text-sm font-semibold text-gray-800">
-                      {
-                        currencies.find((c) => c.value === selectedCurrency)
-                          ?.label
-                      }
-                    </p>
-                  </div>
-                  <ChevronDown
-                    className={`w-4 h-4 text-gray-300 group-hover:text-green-500 transition-colors ${
-                      currencyOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {/* Currency Options */}
-                <div
-                  className={`overflow-hidden transition-all duration-200 ${
-                    currencyOpen
-                      ? "max-h-32 opacity-100 mt-1"
-                      : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="mx-1 rounded-lg border border-gray-100 bg-gray-50/80 overflow-hidden">
-                    {currencies.map((curr) => (
-                      <button
-                        key={curr.value}
-                        onClick={() => {
-                          setSelectedCurrency(curr.value);
-                          setCurrencyOpen(false);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                          selectedCurrency === curr.value
-                            ? "bg-green-50 text-green-700 font-semibold"
-                            : "text-gray-700 hover:bg-white"
-                        }`}
-                      >
-                        <span className="font-medium">{curr.label}</span>
-                        <span className="text-gray-400 ml-1">— {curr.sub}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
 
-          {/* Contact Info */}
-          <div className="p-4 border-t border-gray-100">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Phone className="w-4 h-4 text-green-600" />
-              <span>
-                Need Help?{" "}
-                <span className="text-green-600 font-semibold">+1800 900</span>
-              </span>
+            {/* Contact Info */}
+            <div className="p-4 border-t border-gray-100">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Phone className="w-4 h-4 text-green-600" />
+                <span>
+                  Need Help?{" "}
+                  <span className="text-green-600 font-semibold">
+                    +1800 900
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
         </div>

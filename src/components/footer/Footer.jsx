@@ -137,7 +137,7 @@ const Footer = () => {
     {
       name: "Telegram",
       iconClass: "fab fa-telegram-plane",
-      url: "https://t.me/ousa",
+      url: "https://t.me//Heng_OuSa",
       color: "#0088cc",
       followCount: "8.5K",
     },

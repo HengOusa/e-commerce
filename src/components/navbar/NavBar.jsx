@@ -412,7 +412,7 @@ const NavBar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14 gap-3 lg:gap-5">
             {/* Browse Categories Button (Tablet/Desktop) */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 z-3">
               <DropdownMenu
                 options={categories}
                 value={category}
@@ -425,7 +425,7 @@ const NavBar = () => {
             <div className="h-6 w-px bg-gray-200 hidden lg:block"></div>
 
             {/* Navigation Links */}
-            <div className="flex items-center gap-4 lg:gap-6">
+            <div className="flex items-center gap-4 lg:gap-6 z-3">
               <NavItem
                 label="Home"
                 dropdownItems={homeDropdown}
