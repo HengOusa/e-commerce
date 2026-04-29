@@ -1,14 +1,7 @@
-import React, { useState, useEffect } from "react";
-import {
-  useParams,
-  useSearchParams,
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
-  Minus,
-  Plus,
   Truck,
   CreditCard,
   Banknote,
@@ -23,27 +16,22 @@ import {
   Check,
   Package,
   Clock,
-  AlertCircle,
+  ShoppingCart,
   Download,
   TruckIcon,
 } from "lucide-react";
-import { getProductById } from "../../../data/products";
-import { useOrder } from "../../../contexts/OrderContext";
-import { generateInvoicePDF } from "../../../utils/invoiceGenerator";
+import { useCart } from "../../contexts/CartContext";
+import { useOrder } from "../../contexts/OrderContext";
+import { generateInvoicePDF } from "../../utils/invoiceGenerator";
 
-const BuyOnePage = () => {
-  const { id } = useParams();
-  const [searchParams] = useSearchParams();
+const CheckoutPage = () => {
   const navigate = useNavigate();
-  const initialQty = parseInt(searchParams.get("qty")) || 1;
-
+  const { cartItems, getCartTotal, getItemTotal, clearCart } = useCart();
   const { addOrder, getOrderById } = useOrder();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(initialQty);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderSnapshot, setOrderSnapshot] = useState(null);
   const [createdOrderId, setCreatedOrderId] = useState(null);
   const [errors, setErrors] = useState({});
 
@@ -94,23 +82,10 @@ const BuyOnePage = () => {
     { id: "wallet", label: "Mobile Wallet", icon: Smartphone },
   ];
 
-  // Load product
-  useEffect(() => {
-    setLoading(true);
-    const found = getProductById(id);
-    setProduct(found || null);
-    setLoading(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [id]);
-
   // Calculations
-  const unitPrice = product?.unit_price || 0;
-  const discountPercent = product?.discount_percent || 0;
-  const finalUnitPrice = unitPrice * (1 - discountPercent / 100);
-  const subtotal = finalUnitPrice * quantity;
+  const subtotal = getCartTotal();
   const shipping =
     deliveryOptions.find((d) => d.id === deliveryMethod)?.price || 0;
-  const discountAmount = (unitPrice - finalUnitPrice) * quantity;
   const total = subtotal + shipping;
 
   // Form handlers
@@ -145,6 +120,11 @@ const BuyOnePage = () => {
     setIsPlacingOrder(true);
     setTimeout(() => {
       setIsPlacingOrder(false);
+      const snapshot = {
+        items: cartItems.map((item) => ({ ...item })),
+        total: total,
+      };
+      setOrderSnapshot(snapshot);
       setOrderSuccess(true);
 
       const selectedDelivery = deliveryOptions.find(
@@ -155,8 +135,8 @@ const BuyOnePage = () => {
       );
 
       const orderId = addOrder({
-        items: [{ ...product, qty: quantity }],
-        total: total,
+        items: snapshot.items,
+        total: snapshot.total,
         shipping: shipping,
         subtotal: subtotal,
         customer: {
@@ -180,38 +160,34 @@ const BuyOnePage = () => {
         },
       });
       setCreatedOrderId(orderId);
+
+      clearCart();
+      setTimeout(() => {
+        navigate("/orders");
+      }, 1500);
     }, 2000);
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading checkout...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Product not found
-  if (!product) {
+  // Empty cart state
+  if (cartItems.length === 0 && !orderSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <div className="text-center max-w-md">
+          <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingCart className="w-12 h-12 text-green-500" />
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Product Not Found
+            Your Cart is Empty
           </h2>
-          <p className="text-gray-500 mb-6">
-            The product you are trying to buy does not exist.
+          <p className="text-gray-500 mb-8">
+            You don&apos;t have any items to checkout. Start shopping to add
+            products to your cart!
           </p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-700 transition"
+            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
             Continue Shopping
           </Link>
         </div>
@@ -225,12 +201,12 @@ const BuyOnePage = () => {
       <div className="bg-white border-b border-gray-100 sticky top-0 z-29 md:z-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
-            to={`/product/${product.id}`}
+            to="/cart"
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
           >
             <ChevronLeft className="w-5 h-5" />
             <span className="font-medium text-sm sm:text-base">
-              Back to Product
+              Back to Cart
             </span>
           </Link>
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">
@@ -584,58 +560,47 @@ const BuyOnePage = () => {
                 Order Summary
               </h2>
 
-              {/* Product */}
-              <div className="flex gap-4 mb-5 pb-5 border-b border-gray-100">
-                <div className="relative shrink-0">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-20 h-20 rounded-xl object-cover border border-gray-100"
-                  />
-                  <span className="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                    {quantity}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm line-clamp-2">
-                    {product.name}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">{product.shop}</p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="text-green-600 font-bold text-sm">
-                      ${finalUnitPrice.toFixed(2)}
-                    </span>
-                    {discountPercent > 0 && (
-                      <span className="text-gray-400 text-xs line-through">
-                        ${unitPrice.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Quantity Stepper */}
-              <div className="flex items-center justify-between mb-5 pb-5 border-b border-gray-100">
-                <span className="text-sm font-medium text-gray-700">
-                  Quantity
-                </span>
-                <div className="flex items-center border border-gray-200 rounded-full">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-l-full transition"
-                  >
-                    <Minus className="w-3.5 h-3.5" />
-                  </button>
-                  <span className="w-10 text-center font-medium text-sm text-gray-900">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-r-full transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+              {/* Cart Items */}
+              <div className="space-y-4 mb-5 pb-5 border-b border-gray-100 max-h-80 overflow-y-auto">
+                {cartItems.map((item) => {
+                  const unitFinalPrice =
+                    item.unit_price * (1 - (item.discount_percent || 0) / 100);
+                  return (
+                    <div key={item.id} className="flex gap-4 mt-3">
+                      <div className="relative shrink-0">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-20 h-20 rounded-xl object-cover border border-gray-100"
+                        />
+                        <span className="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                          {item.qty}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm line-clamp-2">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {item.shop}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-green-600 font-bold text-sm">
+                            ${unitFinalPrice.toFixed(2)}
+                          </span>
+                          {item.discount_percent > 0 && (
+                            <span className="text-gray-400 text-xs line-through">
+                              ${item.unit_price.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Total: ${getItemTotal(item).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Price Breakdown */}
@@ -644,14 +609,6 @@ const BuyOnePage = () => {
                   <span className="text-gray-500">Subtotal</span>
                   <span className="text-gray-900">${subtotal.toFixed(2)}</span>
                 </div>
-                {discountAmount > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Discount</span>
-                    <span className="text-green-600">
-                      -${discountAmount.toFixed(2)}
-                    </span>
-                  </div>
-                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Shipping</span>
                   <span className="text-gray-900">
@@ -710,54 +667,69 @@ const BuyOnePage = () => {
             <p className="text-gray-500 mb-2">
               Thank you, {form.firstName}. Your order has been received.
             </p>
-            <p className="text-sm text-gray-400 mb-8">
-              Order #{createdOrderId}
+            <p className="text-sm text-gray-400 mb-6">
+              Order #{createdOrderId || "N/A"}
             </p>
 
-            <div className="bg-gray-50 rounded-2xl p-4 mb-8 text-left">
-              <div className="flex items-center gap-3 mb-3">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-14 h-14 rounded-xl object-cover"
-                />
-                <div>
-                  <p className="font-medium text-gray-900 text-sm line-clamp-1">
-                    {product.name}
-                  </p>
-                  <p className="text-xs text-gray-500">Qty: {quantity}</p>
-                </div>
-                <span className="ml-auto font-semibold text-gray-900">
-                  ${total.toFixed(2)}
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => navigate("/orders")}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3.5 rounded-full transition flex items-center justify-center gap-2"
-              >
-                <TruckIcon className="w-5 h-5" />
-                Track Order
-              </button>
+            <div className="flex gap-3 mb-6">
               <button
                 onClick={() => {
                   const order = getOrderById(createdOrderId);
                   if (order) generateInvoicePDF(order);
                 }}
-                className="w-full bg-white border-2 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-3.5 rounded-full transition flex items-center justify-center gap-2"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-full transition"
               >
-                <Download className="w-5 h-5" />
-                Download Invoice
+                <Download className="w-4 h-4" />
+                Invoice
               </button>
               <button
-                onClick={() => navigate("/")}
-                className="w-full text-gray-500 hover:text-gray-700 font-medium py-2 transition text-sm"
+                onClick={() => navigate("/orders")}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-green-600 text-green-700 hover:bg-green-50 text-sm font-medium rounded-full transition"
               >
-                Continue Shopping
+                <TruckIcon className="w-4 h-4" />
+                Track Order
               </button>
             </div>
+
+            <div className="bg-gray-50 rounded-2xl p-4 mb-8 text-left max-h-48 overflow-y-auto">
+              {(orderSnapshot?.items || []).map((item) => {
+                const itemTotal =
+                  item.unit_price *
+                  (1 - (item.discount_percent || 0) / 100) *
+                  item.qty;
+                return (
+                  <div key={item.id} className="flex items-center gap-3 mb-3">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-14 h-14 rounded-xl object-cover"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900 text-sm line-clamp-1">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-gray-500">Qty: {item.qty}</p>
+                    </div>
+                    <span className="ml-auto font-semibold text-gray-900">
+                      ${itemTotal.toFixed(2)}
+                    </span>
+                  </div>
+                );
+              })}
+              <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+                <span className="font-bold text-gray-900">Total</span>
+                <span className="font-bold text-gray-900">
+                  ${orderSnapshot?.total?.toFixed(2) || "0.00"}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate("/")}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3.5 rounded-full transition"
+            >
+              Continue Shopping
+            </button>
           </div>
         </div>
       )}
@@ -765,4 +737,4 @@ const BuyOnePage = () => {
   );
 };
 
-export default BuyOnePage;
+export default CheckoutPage;

@@ -19,6 +19,8 @@ import {
   Award,
   Zap,
 } from "lucide-react";
+import { useCart } from "../../contexts/CartContext";
+import { useWishlist } from "../../contexts/WishlistContext";
 import { getProductById, allProducts } from "../../data/products";
 import ProductCard from "./ProductCard";
 
@@ -56,13 +58,16 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAddedToBag, setIsAddedToBag] = useState(false);
   const relatedRef = useRef(null);
   const relatedIntervalRef = useRef(null);
   const [isRelatedAutoPlaying, setIsRelatedAutoPlaying] = useState(true);
   const [showRelatedArrows, setShowRelatedArrows] = useState(false);
+
+  const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const isFavorite = isInWishlist(Number(id));
 
   // Label colors (match ProductCard)
   const labelColors = {
@@ -129,6 +134,7 @@ const ProductDetail = () => {
 
   // Add to bag handler
   const handleAddToBag = () => {
+    addToCart(product, quantity);
     setIsAddedToBag(true);
     setTimeout(() => setIsAddedToBag(false), 2000);
   };
@@ -458,7 +464,7 @@ const ProductDetail = () => {
                 )}
               </button>
               <button
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={() => toggleWishlist(product)}
                 className={`w-14 h-14 flex items-center justify-center rounded-full border-2 transition-all duration-300 ${
                   isFavorite
                     ? "border-red-500 bg-red-50"

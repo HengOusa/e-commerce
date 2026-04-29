@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../../contexts/CartContext";
+import { useWishlist } from "../../contexts/WishlistContext";
 
 const ProductCard = ({ product, className = "" }) => {
   const navigate = useNavigate();
+  const { addToCart, cartItems } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const [justAdded, setJustAdded] = useState(false);
+
+  const inWishlist = isInWishlist(product.id);
+
+  const cartItem = cartItems.find((item) => item.id === product.id);
+  const inCartQty = cartItem ? cartItem.qty : 0;
+
   const finalPrice = (
     product.unit_price *
     (1 - product.discount_percent / 100)
@@ -20,18 +31,26 @@ const ProductCard = ({ product, className = "" }) => {
     Limited: "bg-pink-600",
   };
 
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product, 1);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 600);
+  };
+
   return (
     <Link
       to={`/product/${product.id}`}
       key={product.id}
-      className={`flex-shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg snap-start transition-all duration-300 hover:-translate-y-1 group/product overflow-hidden ${className}`}
+      className={`shrink-0 w-44 sm:w-52 md:w-60 lg:w-64 bg-white border border-gray-100 rounded-2xl shadow-sm shadow-green-100 hover:shadow-green-400 hover:shadow-md snap-start transition-all duration-300 hover:scale-102 group/product overflow-hidden ${className}`}
     >
       {/* Image Container */}
       <div className="relative w-full h-44 sm:h-52 md:h-60 overflow-hidden">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-bottom  transition-transform duration-500"
+          className="w-full h-full object-bottom transition-transform duration-500"
         />
 
         {/* Label Badge */}
@@ -55,13 +74,23 @@ const ProductCard = ({ product, className = "" }) => {
         {/* Action Buttons - Wishlist & Cart */}
         <div className="absolute top-2 right-2 flex flex-col gap-2">
           <button
-            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
-            aria-label="Add to wishlist"
-            onClick={(e) => e.preventDefault()}
+            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition hover:scale-110 ${
+              inWishlist
+                ? "bg-red-50 text-red-500"
+                : "bg-white/90 hover:bg-white text-gray-400 hover:text-red-500"
+            }`}
+            aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(product);
+            }}
           >
             <svg
-              className="w-4 h-4 text-gray-400 hover:text-red-500 transition cursor-pointer"
-              fill="none"
+              className={`w-4 h-4 transition cursor-pointer ${
+                inWishlist ? "text-red-500 fill-red-500" : ""
+              }`}
+              fill={inWishlist ? "currentColor" : "none"}
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
@@ -73,24 +102,40 @@ const ProductCard = ({ product, className = "" }) => {
               />
             </svg>
           </button>
+
+          {/* Cart Button / Counter */}
           <button
-            className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm transition hover:scale-110"
-            aria-label="Add to cart"
-            onClick={(e) => e.preventDefault()}
+            onClick={handleCartClick}
+            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition hover:scale-110 ${
+              justAdded
+                ? "bg-green-500 text-white scale-110"
+                : inCartQty > 0
+                  ? "bg-green-500 text-white font-bold text-sm border border-green-500 hover:bg-green-600"
+                  : "bg-white/90 hover:bg-white text-gray-400 hover:text-green-600"
+            }`}
+            aria-label={
+              inCartQty > 0
+                ? `Add another to cart (${inCartQty})`
+                : "Add to cart"
+            }
           >
-            <svg
-              className="w-4 h-4 text-gray-400 hover:text-green-600 transition cursor-pointer"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
+            {inCartQty > 0 ? (
+              <span className="leading-none select-none">{inCartQty}</span>
+            ) : (
+              <svg
+                className="w-4 h-4 transition cursor-pointer"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            )}
           </button>
         </div>
 
@@ -115,7 +160,7 @@ const ProductCard = ({ product, className = "" }) => {
         <p className="text-xs text-gray-500 mb-1">{product.shop}</p>
 
         {/* Product Name */}
-        <h3 className="font-bold text-gray-800 text-sm sm:text-base  mb-2 leading-tight line-clamp-1">
+        <h3 className="font-bold text-gray-800 text-sm sm:text-base mb-2 leading-tight line-clamp-1">
           {product.name}
         </h3>
 

@@ -32,6 +32,7 @@ const NavBar = () => {
 
   // Dropdown content for each nav item
   const homeDropdown = [
+    { label: "Home", link: "/" },
     { label: "Dashboard", link: "/dashboard" },
     { label: "New Arrivals", link: "/new-arrivals" },
     { label: "Trending", link: "/trending" },
@@ -39,12 +40,12 @@ const NavBar = () => {
   ];
 
   const shopDropdown = [
-    { label: "Men's Fashion", link: "/mens-fashion" },
-    { label: "Women's Fashion", link: "/womens-fashion" },
-    { label: "Accessories", link: "/accessories" },
-    { label: "Footwear", link: "/footwear" },
-    { label: "Best Sellers", link: "/best-sellers" },
-    { label: "All Products", link: "/all-products", isHighlight: true },
+    { label: "Men's Fashion", link: "/shop/mens-fashion" },
+    { label: "Women's Fashion", link: "/shop/womens-fashion" },
+    { label: "Accessories", link: "/shop/accessories" },
+    { label: "Footwear", link: "/shop/footwear" },
+    { label: "Best Sellers", link: "/shop/best-sellers" },
+    { label: "All Products", link: "/shop/all-products", isHighlight: true },
   ];
 
   const vendorsDropdown = [
@@ -237,7 +238,7 @@ const NavBar = () => {
             />
 
             {/* Slide-up Panel - z-index: 101 (above backdrop) */}
-            <div className="fixed inset-x-0 bottom-0 top-[20%] bg-white z-[101] rounded-t-2xl shadow-2xl overflow-hidden flex flex-col animate-slideUp">
+            <div className="fixed inset-x-0 bottom-0 top-[20%] bg-white z-[101] rounded-t-2xl shadow-2xl overflow-hidden flex flex-col animate-navbar-slide">
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
                 <h3 className="text-lg font-bold text-gray-800">Browse</h3>
@@ -476,20 +477,6 @@ const NavBar = () => {
           </div>
         </div>
       </nav>
-
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        .animate-slideUp {
-          animation: slideUp 0.25s ease-out;
-        }
-      `}</style>
     </>
   );
 };

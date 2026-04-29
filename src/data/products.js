@@ -459,13 +459,24 @@ export const dailyBestSellers = [
   },
 ];
 
+import { fashionProducts } from "./fashion-products.js";
+
 export const allProducts = [
   ...products,
   ...popularProducts,
   ...dailyBestSellers,
+  ...fashionProducts,
 ];
+
+import { shopCategories } from "./shop-categories.js";
+
+export const getShopCategory = (id) =>
+  shopCategories.find((cat) => cat.id === id) || null;
 
 export const getProductById = (id) => {
   const numericId = Number(id);
   return allProducts.find((p) => p.id === numericId) || null;
 };
+
+export { categories } from "./categories.js";
+export { shopCategories } from "./shop-categories.js";

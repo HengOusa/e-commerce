@@ -1,3 +1,116 @@
-*{
+* {
   box-sizing: border-box;
+}
+
+/* Dropdown slide-down animation */
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-dropdown-slide {
+  animation: dropdownSlideDown 0.2s ease-out;
+}
+
+/* Menu dropdown slide-down animation */
+@keyframes menuSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-menu-slide {
+  animation: menuSlideDown 0.15s ease-out;
+}
+
+/* Navbar mobile slide-up animation */
+@keyframes navbarSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-navbar-slide {
+  animation: navbarSlideUp 0.25s ease-out;
+}
+
+/* Leaflet custom icon resets */
+.custom-leaflet-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Leaflet popup polish */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem !important;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0.5rem 0.75rem !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  top: 4px !important;
+  right: 4px !important;
+  color: #9ca3af !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #374151 !important;
+}
+
+/* ───────── Google Maps style pin resets ───────── */
+.custom-google-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Pulse animation for live truck marker */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.05;
+  }
+}
+
+/* Google-maps-like popup window */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem 1rem !important;
+  line-height: 1.5 !important;
+  font-family: inherit;
+}
+
+.leaflet-popup-tip {
+  background: white !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
 }

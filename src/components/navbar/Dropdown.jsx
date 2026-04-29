@@ -110,7 +110,7 @@ const Dropdown = ({
             className="
             absolute w-full mt-2 bg-white rounded-xl shadow-xl 
             border border-gray-200 z-50 overflow-hidden
-            animate-slideDown origin-top
+            animate-dropdown-slide origin-top
           "
           >
             {/* Search */}
@@ -217,22 +217,6 @@ const Dropdown = ({
           Please select a valid option
         </p>
       )}
-
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

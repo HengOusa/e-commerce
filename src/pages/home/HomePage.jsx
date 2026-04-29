@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import CategoryCard from "../../components/categories/CategoryCard";
 import ProductCard from "../../components/Prodcuts/ProductCard";
 import {
-  products,
+  categories,
   popularProducts,
   dailyBestSellers,
 } from "../../data/products";
@@ -408,29 +409,8 @@ const HomePage = () => {
             className="hide-scrollbar flex gap-3 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
             onScroll={(e) => setProductScrollLeft(e.target.scrollLeft)}
           >
-            {products.map((item) => (
-              <Link
-                to={`/product/${item.id}`}
-                key={item.id}
-                className="flex-shrink-0 w-35 md:w-40 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md snap-start transition-all duration-300 hover:-translate-y-1 cursor-pointer group/product"
-              >
-                <div className="w-full h-40 overflow-hidden rounded-t-2xl">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover/product:scale-110 transition-transform duration-300"
-                  />
-                </div>
-
-                <div className="p-4 text-center">
-                  <h3 className="font-bold text-gray-800 text-sm md:text-base line-clamp-2">
-                    {item.name}
-                  </h3>
-                  <p className="text-sm text-green-600 font-medium mt-1">
-                    {item.qty} items
-                  </p>
-                </div>
-              </Link>
+            {categories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
             ))}
           </div>
         </div>
@@ -441,12 +421,12 @@ const HomePage = () => {
             <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
               Popular Products
             </h2>
-            <a
-              href="/products"
+            <Link
+              to="/products"
               className="text-sm px-3 sm:text-base text-green-600 hover:text-green-800 font-medium transition"
             >
               View All →
-            </a>
+            </Link>
           </div>
 
           <div
@@ -495,12 +475,12 @@ const HomePage = () => {
             <h2 className="text-base px-3 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-green-700">
               Daily Best Selling Products
             </h2>
-            <a
-              href="/best-sellers"
+            <Link
+              to="/products"
               className="text-sm px-3 sm:text-base text-green-600 hover:text-green-800 font-medium transition"
             >
               View All →
-            </a>
+            </Link>
           </div>
 
           <div

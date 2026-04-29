@@ -45,8 +45,7 @@ const MenuDropdown = ({
   };
 
   const getButtonStyles = () => {
-    if (disabled)
-      return "bg-gray-100 cursor-not-allowed text-gray-400";
+    if (disabled) return "bg-gray-100 cursor-not-allowed text-gray-400";
     if (error) return "text-red-600 bg-red-50";
     return "hover:bg-gray-100 text-gray-700";
   };
@@ -100,7 +99,7 @@ const MenuDropdown = ({
             className="
             absolute left-0 mt-1 min-w-[200px] bg-white rounded-lg shadow-lg 
             border border-gray-200 z-50 overflow-hidden
-            animate-slideDown origin-top
+            animate-menu-slide origin-top
           "
           >
             {/* Optional Search */}
@@ -146,21 +145,22 @@ const MenuDropdown = ({
                     className={`
                       group px-3 py-1.5 cursor-pointer transition-colors duration-150
                       flex items-center justify-between gap-3 text-sm
-                      ${value === opt.value
-                        ? "bg-blue-50 text-blue-700"
-                        : "hover:bg-gray-50 text-gray-700"
+                      ${
+                        value === opt.value
+                          ? "bg-blue-50 text-blue-700"
+                          : "hover:bg-gray-50 text-gray-700"
                       }
                     `}
                   >
                     <span className="flex-1">{opt.label}</span>
-                    
+
                     {/* Shortcut hint (optional) */}
                     {opt.shortcut && (
                       <kbd className="text-xs text-gray-400 font-mono">
                         {opt.shortcut}
                       </kbd>
                     )}
-                    
+
                     {/* Checkmark for selected */}
                     {value === opt.value && (
                       <svg
@@ -191,7 +191,8 @@ const MenuDropdown = ({
               <>
                 <div className="border-t border-gray-100 my-1"></div>
                 <div className="px-3 py-1.5 text-xs text-gray-400 text-center">
-                  {filteredOptions.length} item{filteredOptions.length !== 1 ? "s" : ""}
+                  {filteredOptions.length} item
+                  {filteredOptions.length !== 1 ? "s" : ""}
                 </div>
               </>
             )}
@@ -205,22 +206,6 @@ const MenuDropdown = ({
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.15s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

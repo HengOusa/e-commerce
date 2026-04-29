@@ -16,6 +16,8 @@ import {
   Globe,
   DollarSign,
 } from "lucide-react";
+import { useCart } from "../../contexts/CartContext";
+import { useWishlist } from "../../contexts/WishlistContext";
 import CategoryDropdown from "./CategoryDropdown";
 import Badge from "./Badge";
 
@@ -31,6 +33,11 @@ const NavItem = ({ to, children }) => {
 };
 
 const Header = () => {
+  const { getUniqueCartCount } = useCart();
+  const cartCount = getUniqueCartCount();
+  const { getWishlistCount } = useWishlist();
+  const wishlistCount = getWishlistCount();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -91,12 +98,12 @@ const Header = () => {
     { to: "/about", label: "About Us" },
     { to: "/account", label: "My Account" },
     { to: "/wishlist", label: "Wishlist" },
-    { to: "/orders", label: "Order Tracking" },
+    { to: "/orders", label: "My Orders" },
     { to: "/contact", label: "Contact Us" },
   ];
 
   return (
-    <header className="w-full sticky top-0 z-30">
+    <header className="w-full sticky top-0 z-100">
       {/* ============================================
           MOBILE HEADER (< 768px)
           ============================================ */}
@@ -140,7 +147,7 @@ const Header = () => {
                 to="/cart"
                 className="p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors relative"
               >
-                <Badge icon={faCartArrowDown} count={3} />
+                <Badge icon={faCartArrowDown} count={cartCount} />
               </Link>
             </div>
           </div>
@@ -445,7 +452,7 @@ const Header = () => {
                   to="/wishlist"
                   className="flex flex-col items-center gap-0.5 hover:text-green-600 transition-colors group"
                 >
-                  <Badge icon={faHeart} count={5} />
+                  <Badge icon={faHeart} count={wishlistCount} />
                   <span className="text-[11px] text-gray-700 group-hover:text-green-600">
                     Wishlist
                   </span>
@@ -454,7 +461,7 @@ const Header = () => {
                   to="/cart"
                   className="flex flex-col items-center gap-0.5 hover:text-green-600 transition-colors group"
                 >
-                  <Badge icon={faCartArrowDown} count={3} />
+                  <Badge icon={faCartArrowDown} count={cartCount} />
                   <span className="text-[11px] text-gray-700 group-hover:text-green-600">
                     Cart
                   </span>
@@ -488,7 +495,7 @@ const Header = () => {
             <span className="h-4 w-px bg-gray-300"></span>
             <NavItem to="/wishlist">Wishlist</NavItem>
             <span className="h-4 w-px bg-gray-300"></span>
-            <NavItem to="/orders">Order Tracking</NavItem>
+            <NavItem to="/orders">My Orders</NavItem>
           </ul>
 
           {/* CENTER TEXT */}
@@ -572,14 +579,14 @@ const Header = () => {
               to="/wishlist"
               className="flex items-end gap-1 hover:text-green-600 transition-colors"
             >
-              <Badge icon={faHeart} count={5} />
+              <Badge icon={faHeart} count={wishlistCount} />
               <span className="text-sm text-gray-700">Wishlist</span>
             </Link>
             <Link
               to="/cart"
               className="flex items-end gap-1 hover:text-green-600 transition-colors"
             >
-              <Badge icon={faCartArrowDown} count={3} />
+              <Badge icon={faCartArrowDown} count={cartCount} />
               <span className="text-sm text-gray-700">Cart</span>
             </Link>
             <Link

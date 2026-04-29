@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo/logo.png";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   MapPin,
   Phone,
@@ -38,7 +38,7 @@ const Footer = () => {
 
   const customerLinks = [
     { to: "/account", label: "My Account" },
-    { to: "/orders", label: "Order Tracking" },
+    { to: "/orders", label: "My Orders" },
     { to: "/wishlist", label: "Wishlist" },
     { to: "/faqs", label: "FAQs" },
     { to: "/help", label: "Help Center" },
@@ -396,16 +396,20 @@ const Footer = () => {
                     <div
                       className="w-10 h-10 rounded-full bg-gray-800 hover:shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110"
                       style={{
-                        backgroundColor: hoveredSocial === idx ? social.color : undefined,
+                        backgroundColor:
+                          hoveredSocial === idx ? social.color : undefined,
                       }}
                     >
-                      <i className={`${social.iconClass} text-gray-400 group-hover:text-white transition-colors text-lg`}></i>
+                      <i
+                        className={`${social.iconClass} text-gray-400 group-hover:text-white transition-colors text-lg`}
+                      ></i>
                     </div>
                     {/* Tooltip */}
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                       {social.name}
                       <span className="ml-1 text-green-400">
-                        {typeof social.followCount === 'string' && social.followCount.includes('K')
+                        {typeof social.followCount === "string" &&
+                        social.followCount.includes("K")
                           ? social.followCount
                           : social.followCount}
                       </span>
@@ -430,8 +434,12 @@ const Footer = () => {
                   >
                     <Smartphone className="w-5 h-5 text-gray-400 group-hover:text-white" />
                     <div className="text-left">
-                      <div className="text-gray-400 text-xs group-hover:text-white">Download on</div>
-                      <div className="text-white text-sm font-semibold">App Store</div>
+                      <div className="text-gray-400 text-xs group-hover:text-white">
+                        Download on
+                      </div>
+                      <div className="text-white text-sm font-semibold">
+                        App Store
+                      </div>
                     </div>
                   </a>
                   <a
@@ -442,8 +450,12 @@ const Footer = () => {
                   >
                     <Smartphone className="w-5 h-5 text-gray-400 group-hover:text-white" />
                     <div className="text-left">
-                      <div className="text-gray-400 text-xs group-hover:text-white">Get it on</div>
-                      <div className="text-white text-sm font-semibold">Google Play</div>
+                      <div className="text-gray-400 text-xs group-hover:text-white">
+                        Get it on
+                      </div>
+                      <div className="text-white text-sm font-semibold">
+                        Google Play
+                      </div>
                     </div>
                   </a>
                 </div>
@@ -490,16 +502,25 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-xs text-center sm:text-left">
-              &copy; {getCurrentYear()} OuSa. All rights reserved. | 
-              <Link to="/privacy" className="hover:text-green-500 ml-1 transition-colors">
+              &copy; {getCurrentYear()} OuSa. All rights reserved. |
+              <Link
+                to="/privacy"
+                className="hover:text-green-500 ml-1 transition-colors"
+              >
                 Privacy
               </Link>
               <span className="mx-1">•</span>
-              <Link to="/terms" className="hover:text-green-500 transition-colors">
+              <Link
+                to="/terms"
+                className="hover:text-green-500 transition-colors"
+              >
                 Terms
               </Link>
               <span className="mx-1">•</span>
-              <Link to="/cookies" className="hover:text-green-500 transition-colors">
+              <Link
+                to="/cookies"
+                className="hover:text-green-500 transition-colors"
+              >
                 Cookies
               </Link>
             </p>

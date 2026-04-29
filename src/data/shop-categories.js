@@ -1,0 +1,136 @@
+export const shopCategories = [
+  {
+    id: "mens-fashion",
+    name: "Men's Fashion",
+    description:
+      "Premium collection of men's clothing, shoes and accessories. Discover timeless style and modern trends.",
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "👔",
+    subcategories: ["Shirts", "Pants", "Jackets", "Shoes"],
+    keywords: [
+      "Men",
+      "Shirt",
+      "Pants",
+      "Jacket",
+      "T-Shirt",
+      "Jeans",
+      "Sneakers",
+      "Blazer",
+      "Chinos",
+    ],
+    colors: ["#000000", "#8B4513", "#4682B4", "#228B22", "#FF4500"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    brands: ["Nike", "Adidas", "Gucci", "Zara", "H&M", "Levi's"],
+    count: 0, // Will be calculated
+    bgColor: "from-blue-50 via-indigo-50 to-purple-50",
+  },
+  {
+    id: "womens-fashion",
+    name: "Women's Fashion",
+    description:
+      "Elegant dresses, tops, skirts and more. Find your perfect outfit for any occasion.",
+    image:
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "👗",
+    subcategories: ["Dresses", "Tops", "Skirts", "Heels"],
+    keywords: [
+      "Women",
+      "Dress",
+      "Top",
+      "Skirt",
+      "Blouse",
+      "Heels",
+      "Sandals",
+      "Jeans",
+      "Jumpsuit",
+    ],
+    colors: ["#FF69B4", "#FF1493", "#DC143C", "#00CED1", "#FFD700"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    brands: ["Zara", "H&M", "Mango", "ASOS", "Shein", "Forever 21"],
+    count: 0,
+    bgColor: "from-pink-50 via-rose-50 to-red-50",
+  },
+  {
+    id: "accessories",
+    name: "Accessories",
+    description:
+      "Complete your look with stylish watches, bags, belts and jewelry.",
+    image:
+      "https://images.unsplash.com/photo-1612219363547-743b480a9c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "⌚",
+    subcategories: ["Watches", "Bags", "Jewelry", "Belts"],
+    keywords: [
+      "Watch",
+      "Bag",
+      "Wallet",
+      "Belt",
+      "Sunglasses",
+      "Necklace",
+      "Earrings",
+      "Bracelet",
+    ],
+    colors: ["#C0C0C0", "#FFD700", "#8FBC8F", "#DDA0DD"],
+    sizes: ["One Size", "S", "M", "L"],
+    brands: ["Rolex", "Louis Vuitton", "Ray-Ban", "Tiffany", "Coach"],
+    count: 0,
+    bgColor: "from-gray-50 via-zinc-50 to-stone-50",
+  },
+  {
+    id: "footwear",
+    name: "Footwear",
+    description:
+      "Step out in style with our collection of sneakers, boots and sandals.",
+    image:
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "👟",
+    subcategories: ["Sneakers", "Boots", "Sandals", "Loafers"],
+    keywords: [
+      "Sneakers",
+      "Boots",
+      "Sandals",
+      "Shoes",
+      "Loafers",
+      "Heels",
+      "Trainers",
+    ],
+    colors: ["#FFFFFF", "#000000", "#FF6B6B", "#4ECDC4", "#45B7D1"],
+    sizes: ["6", "7", "8", "9", "10", "11"],
+    brands: ["Nike", "Adidas", "Puma", "Converse", "New Balance", "Vans"],
+    count: 0,
+    bgColor: "from-emerald-50 via-teal-50 to-cyan-50",
+  },
+  {
+    id: "best-sellers",
+    name: "Best Sellers",
+    description: "Shop our most popular items loved by thousands of customers.",
+    image:
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "⭐",
+    subcategories: ["Top Fashion", "Trending", "Most Popular"],
+    keywords: ["Best", "Seller", "Popular", "Trending", "Hot"],
+    colors: ["#FFD700", "#FFA500", "#FF6347"],
+    sizes: ["S", "M", "L", "XL"],
+    brands: ["All Brands"],
+    count: 0,
+    bgColor: "from-yellow-50 via-orange-50 to-red-50",
+  },
+  {
+    id: "all-products",
+    name: "All Products",
+    description: "Browse our entire collection across all categories.",
+    image:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80",
+    icon: "🛍️",
+    subcategories: ["All Categories"],
+    keywords: ["All"],
+    colors: ["#808080"],
+    sizes: [],
+    brands: [],
+    count: 0,
+    bgColor: "from-slate-50 via-gray-50 to-zinc-50",
+  },
+];
+
+export const getShopCategory = (id) =>
+  shopCategories.find((cat) => cat.id === id);

@@ -1,0 +1,199 @@
+import React, { useState, useReducer, useMemo, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { ChevronDown, Shirt, TrendingUp, Users, Zap } from "lucide-react";
+import ProductGrid from "../../../components/shop/ProductGrid";
+import FilterSidebar from "../../../components/shop/FilterSidebar";
+import Breadcrumb from "../../../components/shop/Breadcrumb";
+import TopBar from "../../../components/shop/TopBar";
+import {
+  allProducts,
+  shopCategories,
+  getShopCategory,
+} from "../../../data/products";
+
+const filterReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_FILTER":
+      return { ...state, [action.key]: action.value };
+    case "TOGGLE_FILTER":
+      const current = state[action.key] || [];
+      const isSelected = current.includes(action.value);
+      const newValue = isSelected
+        ? current.filter((v) => v !== action.value)
+        : [...current, action.value];
+      return { ...state, [action.key]: newValue };
+    case "CLEAR_ALL":
+      return initialFilters;
+    case "SET_VIEW_MODE":
+      return { ...state, viewMode: action.mode };
+    default:
+      return state;
+  }
+};
+
+const initialFilters = {
+  searchTerm: "",
+  subcategories: [],
+  sizes: [],
+  colors: [],
+  brands: [],
+  priceRange: { min: 0, max: 300 },
+  minRating: 0,
+  sortBy: "newest",
+  viewMode: "grid",
+};
+
+const MenFashionPage = () => {
+  const { category = "mens-fashion" } = useParams();
+  const [filters, dispatch] = useReducer(filterReducer, initialFilters);
+
+  const categoryData = getShopCategory("mens-fashion");
+
+  // Men's fashion keywords
+  const menKeywords = [
+    "Men",
+    "Shirt",
+    "Pants",
+    "Jacket",
+    "T-Shirt",
+    "Jeans",
+    "Sneakers",
+    "Blazer",
+    "Chinos",
+    "Zara",
+    "Levi's",
+    "Nike",
+  ];
+
+  const categoryProducts = useMemo(() => {
+    return allProducts.filter((product) =>
+      menKeywords.some(
+        (keyword) =>
+          product.name.toLowerCase().includes(keyword.toLowerCase()) ||
+          product.category === "mens-fashion",
+      ),
+    );
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    let results = [...categoryProducts];
+
+    if (filters.searchTerm) {
+      results = results.filter((p) =>
+        p.name.toLowerCase().includes(filters.searchTerm.toLowerCase()),
+      );
+    }
+
+    if (filters.sizes.length > 0) {
+      results = results.filter((p) => filters.sizes.includes(p.size));
+    }
+
+    if (filters.colors.length > 0) {
+      results = results.filter((p) => filters.colors.includes(p.color));
+    }
+
+    if (filters.brands.length > 0) {
+      results = results.filter((p) => filters.brands.includes(p.brand));
+    }
+
+    results = results.filter(
+      (p) =>
+        p.unit_price >= filters.priceRange.min &&
+        p.unit_price <= filters.priceRange.max,
+    );
+
+    if (filters.minRating > 0) {
+      results = results.filter(
+        (p) => (p.rating?.point || 0) >= filters.minRating,
+      );
+    }
+
+    const sortFns = {
+      newest: (a, b) => (b.id || 0) - (a.id || 0),
+      "price-low": (a, b) => a.unit_price - b.unit_price,
+      "price-high": (a, b) => b.unit_price - a.unit_price,
+      bestsellers: (a, b) => (b.sold || 0) - (a.sold || 0),
+      rating: (a, b) => (b.rating?.point || 0) - (a.rating?.point || 0),
+    };
+
+    results.sort(sortFns[filters.sortBy] || sortFns.newest);
+
+    return results;
+  }, [categoryProducts, filters]);
+
+  useEffect(() => {
+    document.title = "Men's Fashion - Timeless Style | Ousa";
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <Breadcrumb categoryId="mens-fashion" />
+
+        {/* Men's Fashion Hero */}
+        <div className="text-center mb-20 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-200 p-20 rounded-3xl shadow-2xl">
+          <div className="inline-block p-4 mb-8 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-3xl shadow-2xl">
+            <Shirt className="w-20 h-20 text-white" />
+          </div>
+          <h1 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-6">
+            Men's Fashion
+          </h1>
+          <p className="text-xl lg:text-2xl text-slate-700 max-w-3xl mx-auto mb-12">
+            Timeless style meets modern trends. Premium menswear for every
+            occasion.
+          </p>
+
+          {/* Featured Items */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+              <div className="text-3xl font-bold text-blue-600 mb-2">245+</div>
+              <div className="text-sm text-slate-600">New Arrivals</div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+              <div className="text-3xl font-bold text-indigo-600 mb-2">4.7</div>
+              <div className="text-sm text-slate-600">Avg Rating</div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+              <div className="text-3xl font-bold text-purple-600 mb-2">
+                1.2K
+              </div>
+              <div className="text-sm text-slate-600">Weekly Sold</div>
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+              <TrendingUp className="w-12 h-12 text-blue-500 mx-auto mb-3" />
+              <div className="text-sm font-semibold text-slate-700">
+                Top Trends
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-[minmax(0,350px)_1fr] xl:grid-cols-[minmax(0,400px)_1fr] gap-12">
+          <div className="order-2 lg:order-1">
+            <FilterSidebar
+              categoryId="mens-fashion"
+              products={categoryProducts}
+              filters={filters}
+              dispatch={dispatch}
+            />
+          </div>
+
+          <div className="order-1 lg:order-2">
+            <TopBar
+              totalCount={filteredProducts.length}
+              sortBy={filters.sortBy}
+              onSortChange={(value) =>
+                dispatch({ type: "SET_FILTER", key: "sortBy", value })
+              }
+              viewMode={filters.viewMode}
+              onViewChange={(mode) => dispatch({ type: "SET_VIEW_MODE", mode })}
+            />
+            <ProductGrid products={filteredProducts} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MenFashionPage;
